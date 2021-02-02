@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ConsolePlugin = require('./console-plugin');
 // const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 // const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const s3Path = 'https://s3plus.vip.sankuai.com/hrdataportal/helper/';
@@ -68,7 +69,7 @@ const webpackConfig = {
             },
           },
           {
-            loader: path.resolve(__dirname, './replace-ejs-loader.js'),
+            loader: path.resolve(__dirname, './replace-html-loader.js'),
             options: {
               key: 'include',
               data: 'data',
@@ -161,6 +162,7 @@ const webpackConfig = {
         collapseWhitespace: true, // 去除空格
       },
     }),
+    new ConsolePlugin(),
     // new MiniCssExtractPlugin(),
     // new BundleAnalyzerPlugin({
     //   analyzerMode: 'server',
