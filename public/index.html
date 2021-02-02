@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport"
+       content="user-scalable=no,width=device-width,initial-scale=1,maximum-scale=1viewport-fit=cover">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <title>截图服务</title>
+</head>
+
+<body>
+   <script>
+
+       const queuedObservers = new Set();
+       const observe = fn => queuedObservers.add(fn);
+       const observable = obj => new Proxy(obj, { set });
+       function set(target, key, value, receiver) {
+           const result = Reflect.set(target, key, value, receiver);
+           queuedObservers.forEach(observer => observer());
+           return result;
+       }
+
+       const dataSource = observable({});
+       /**
+       * 轮询检测
+       */
+       let sum = 0;
+
+       const getDataSource = () => {
+           if (sum < 120) { // 120
+               if (Reflect.has(window, 'get_data_source')) {
+                   // 获取截图容器注入的数据
+                   Reflect.get(window, 'get_data_source')().then((source) => {
+                       dataSource.data = source;
+                   });
+               } else {
+                   sum++;
+                   setTimeout(getDataSource, 100);
+               }
+           } else {
+               document.body.innerText = '截图服务---调用容器方法失败';
+           }
+       };
+       window.requestAnimationFrame(getDataSource);
+   </script>
+   <div id="root"></div>
+</body>
+
+</html>
